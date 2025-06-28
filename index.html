@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .length-section {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .password-section {
+            margin-bottom: 25px;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        #passwordField {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            background: #f9f9f9;
+            transition: border-color 0.3s ease;
+            user-select: all;
+        }
+
+        #passwordField:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .settings-btn:hover {
+            transform: rotate(90deg);
+            background: white;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .settings-panel.active {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .settings-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .setting-group {
+            margin-bottom: 25px;
+        }
+
+        .setting-group h3 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .test-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            background: #f0f8ff;
+            border: 1px solid #b0d4ff;
+            color: #333;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+            .settings-panel {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="settings-btn" id="settingsBtn">⚙️</button>
+        
+        <h1>Password Generator</h1>
+        
+        <div class="length-section">
+            <label for="lengthInput">Password Length:</label>
+            <input type="number" id="lengthInput" min="4" max="128" value="16">
+        </div>
+        
+        <div class="password-section">
+            <label for="passwordField">Generated Password:</label>
+            <div class="password-container">
+                <input type="text" id="passwordField" placeholder="Click Generate to create password">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" id="generateBtn">Generate</button>
+            <button class="btn btn-secondary" id="copyBtn">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <h2>Settings</h2>
+            <button class="close-btn" id="closeBtn">×</button>
+        </div>
+        
+        <div class="setting-group">
+            <h3>Special Characters</h3>
+            <textarea id="specialChars" placeholder="Enter allowed special characters">!@#$%^&*()_+-=[]{}|;:,.<>?</textarea>
+        </div>
+        
+        <div class="setting-group">
+            <h3>Numbers</h3>
+            <textarea id="numbers" placeholder="Enter allowed numbers">0123456789</textarea>
+        </div>
+        
+        <div class="setting-group">
+            <h3>Character Types</h3>
+            <div class="checkbox-group">
+                <input type="checkbox" id="requireUppercase" checked>
+                <label for="requireUppercase">Require Uppercase Letters</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="requireLowercase" checked>
+                <label for="requireLowercase">Require Lowercase Letters</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="requireNumbers" checked>
+                <label for="requireNumbers">Require Numbers</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="requireSpecial" checked>
+                <label for="requireSpecial">Require Special Characters</label>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <h3>Test Settings</h3>
+            <button class="btn btn-secondary" id="testBtn">Test Current Settings</button>
+            <div id="testResult"></div>
+        </div>
+        
+        <div class="settings-actions">
+            <button class="btn btn-primary" id="saveBtn">Save Settings</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset to Defaults</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        class PasswordGenerator {
+            constructor() {
+                this.storageAvailable = this.checkStorageAvailability();
+                this.deviceId = this.getDeviceId();
+                this.initializeElements();
+                this.loadSettings();
+                this.bindEvents();
+                this.generatePassword();
+            }
+
+            checkStorageAvailability() {
+                try {
+                    const test = '__localStorage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            getDeviceId() {
+                if (!this.storageAvailable) {
+                    return 'temp_session_' + Math.random().toString(36).substr(2, 9);
+                }
+                
+                try {
+                    let deviceId = localStorage.getItem('deviceId');
+                    if (!deviceId) {
+                        deviceId = 'device_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                        localStorage.setItem('deviceId', deviceId);
+                    }
+                    return deviceId;
+                } catch (e) {
+                    return 'temp_session_' + Math.random().toString(36).substr(2, 9);
+                }
+            }
+
+            initializeElements() {
+                this.lengthInput = document.getElementById('lengthInput');
+                this.passwordField = document.getElementById('passwordField');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.copyBtn = document.getElementById('copyBtn');
+                this.settingsBtn = document.getElementById('settingsBtn');
+                this.settingsPanel = document.getElementById('settingsPanel');
+                this.overlay = document.getElementById('overlay');
+                this.closeBtn = document.getElementById('closeBtn');
+                this.specialChars = document.getElementById('specialChars');
+                this.numbers = document.getElementById('numbers');
+                this.requireUppercase = document.getElementById('requireUppercase');
+                this.requireLowercase = document.getElementById('requireLowercase');
+                this.requireNumbers = document.getElementById('requireNumbers');
+                this.requireSpecial = document.getElementById('requireSpecial');
+                this.saveBtn = document.getElementById('saveBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.testBtn = document.getElementById('testBtn');
+                this.testResult = document.getElementById('testResult');
+                this.toast = document.getElementById('toast');
+            }
+
+            bindEvents() {
+                this.generateBtn.addEventListener('click', () => this.generatePassword());
+                this.copyBtn.addEventListener('click', () => this.copyToClipboard());
+                this.settingsBtn.addEventListener('click', () => this.openSettings());
+                this.closeBtn.addEventListener('click', () => this.closeSettings());
+                this.overlay.addEventListener('click', () => this.closeSettings());
+                this.saveBtn.addEventListener('click', () => this.saveSettings());
+                this.resetBtn.addEventListener('click', () => this.resetSettings());
+                this.testBtn.addEventListener('click', () => this.testSettings());
+                
+                this.passwordField.addEventListener('dblclick', () => {
+                    this.passwordField.select();
+                    this.copyToClipboard();
+                });
+
+                this.lengthInput.addEventListener('change', () => this.generatePassword());
+            }
+
+            loadSettings() {
+                if (!this.storageAvailable) {
+                    this.resetToDefaults();
+                    return;
+                }
+
+                try {
+                    const savedSettings = localStorage.getItem(`settings_${this.deviceId}`);
+                    if (savedSettings) {
+                        const settings = JSON.parse(savedSettings);
+                        this.lengthInput.value = settings.length || 16;
+                        this.specialChars.value = settings.specialChars || '!@#$%^&*()_+-=[]{}|;:,.<>?';
+                        this.numbers.value = settings.numbers || '0123456789';
+                        this.requireUppercase.checked = settings.requireUppercase !== false;
+                        this.requireLowercase.checked = settings.requireLowercase !== false;
+                        this.requireNumbers.checked = settings.requireNumbers !== false;
+                        this.requireSpecial.checked = settings.requireSpecial !== false;
+                    } else {
+                        this.resetToDefaults();
+                    }
+                } catch (e) {
+                    this.resetToDefaults();
+                }
+            }
+
+            saveSettings() {
+                const settings = {
+                    length: parseInt(this.lengthInput.value),
+                    specialChars: this.specialChars.value,
+                    numbers: this.numbers.value,
+                    requireUppercase: this.requireUppercase.checked,
+                    requireLowercase: this.requireLowercase.checked,
+                    requireNumbers: this.requireNumbers.checked,
+                    requireSpecial: this.requireSpecial.checked
+                };
+                
+                if (this.storageAvailable) {
+                    try {
+                        localStorage.setItem(`settings_${this.deviceId}`, JSON.stringify(settings));
+                        this.showToast('Settings saved successfully!');
+                    } catch (e) {
+                        this.showToast('Settings saved for this session only');
+                    }
+                } else {
+                    this.showToast('Settings saved for this session only');
+                }
+                
+                this.closeSettings();
+                this.generatePassword();
+            }
+
+            resetSettings() {
+                this.resetToDefaults();
+                this.showToast('Settings reset to defaults!');
+            }
+
+            resetToDefaults() {
+                this.lengthInput.value = 16;
+                this.specialChars.value = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+                this.numbers.value = '0123456789';
+                this.requireUppercase.checked = true;
+                this.requireLowercase.checked = true;
+                this.requireNumbers.checked = true;
+                this.requireSpecial.checked = true;
+            }
+
+            testSettings() {
+                try {
+                    const testPassword = this.generatePasswordWithSettings();
+                    this.testResult.innerHTML = `<strong>Test Password:</strong> ${testPassword}`;
+                    this.testResult.style.display = 'block';
+                } catch (error) {
+                    this.testResult.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                    this.testResult.style.display = 'block';
+                }
+            }
+
+            generatePasswordWithSettings() {
+                const length = parseInt(this.lengthInput.value) || 16;
+                const specialChars = this.specialChars.value || '';
+                const numbers = this.numbers.value || '';
+                const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+
+                let charset = '';
+                let required = '';
+
+                if (this.requireUppercase && this.requireUppercase.checked) {
+                    charset += uppercase;
+                    required += uppercase[Math.floor(Math.random() * uppercase.length)];
+                }
+
+                if (this.requireLowercase && this.requireLowercase.checked) {
+                    charset += lowercase;
+                    required += lowercase[Math.floor(Math.random() * lowercase.length)];
+                }
+
+                if (this.requireNumbers && this.requireNumbers.checked && numbers) {
+                    charset += numbers;
+                    required += numbers[Math.floor(Math.random() * numbers.length)];
+                }
+
+                if (this.requireSpecial && this.requireSpecial.checked && specialChars) {
+                    charset += specialChars;
+                    required += specialChars[Math.floor(Math.random() * specialChars.length)];
+                }
+
+                if (!charset) {
+                    throw new Error('At least one character type must be selected');
+                }
+
+                if (length < 1) {
+                    throw new Error('Password length must be at least 1');
+                }
+
+                if (length < required.length) {
+                    throw new Error('Password length must be at least ' + required.length + ' to meet requirements');
+                }
+
+                let password = required;
+                for (let i = required.length; i < length; i++) {
+                    password += charset[Math.floor(Math.random() * charset.length)];
+                }
+
+                // Shuffle the password to mix required characters
+                return password.split('').sort(() => Math.random() - 0.5).join('');
+            }
+
+            generatePassword() {
+                try {
+                    const password = this.generatePasswordWithSettings();
+                    this.passwordField.value = password;
+                } catch (error) {
+                    this.passwordField.value = 'Error: ' + error.message;
+                }
+            }
+
+            copyToClipboard() {
+                const password = this.passwordField.value;
+                if (!password || password.startsWith('Error:')) {
+                    this.showToast('No valid password to copy!');
+                    return;
+                }
+
+                // Try modern Clipboard API first
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(password).then(() => {
+                        this.showToast('Password copied to clipboard!');
+                    }).catch(() => {
+                        // Fallback to older method
+                        this.fallbackCopy(password);
+                    });
+                } else {
+                    // Fallback for older browsers or non-HTTPS
+                    this.fallbackCopy(password);
+                }
+            }
+
+            fallbackCopy(text) {
+                this.passwordField.select();
+                this.passwordField.setSelectionRange(0, 99999); // For mobile devices
+                try {
+                    document.execCommand('copy');
+                    this.showToast('Password copied to clipboard!');
+                } catch (err) {
+                    this.showToast('Copy failed - please select and copy manually');
+                }
+            }
+
+            openSettings() {
+                this.settingsPanel.classList.add('active');
+                this.overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeSettings() {
+                this.settingsPanel.classList.remove('active');
+                this.overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+                this.testResult.style.display = 'none';
+            }
+
+            showToast(message) {
+                this.toast.textContent = message;
+                this.toast.classList.add('show');
+                setTimeout(() => {
+                    this.toast.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize the password generator when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new PasswordGenerator();
+        });
+    </script>
+</body>
+</html>
